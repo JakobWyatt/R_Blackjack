@@ -1,15 +1,14 @@
 blackjack <- function() {
     card_deck <- 1:52
-    temp_card_sample <- sample_remove(card_deck)
-    user_cards <- temp_card_sample[[1]]
-    card_deck <- temp_card_sample[[2]]
+    temp_card_sample <- sample_remove(card_deck, 2)
+    user_cards <- temp_card_sample$val
+    card_deck <- temp_card_sample$vector
     print(to_card(user_cards))
-    print(to_card(card_deck))
 }
 
-sample_remove <- function(vector) {
-    x <- sample(vector, 1)
-    return(list(x, vector[! vector %in% x]))
+sample_remove <- function(vector, num=1) {
+    x <- sample(vector, num)
+    return(list("val"=x, "vector"=vector[! vector %in% x]))
 }
 
 to_card <- function(num) {
