@@ -5,13 +5,21 @@ blackjack <- function() {
     temp_card_sample <- sample_remove(card_deck, 2)
     user_cards <- temp_card_sample$val
     card_deck <- temp_card_sample$vector
-    cat("Your cards are", prettify_vec(to_card(user_cards)), "\n")
+    tell_cards(user_cards)
+    blackjack_turn(user_cards, card_deck)
+}
+
+blackjack_turn <- function(user_cards, card_deck) {
     if(turn_decision()) {
         temp_card_sample <- sample_remove(card_deck)
         user_cards <- c(user_cards, temp_card_sample$val)
         card_deck <- temp_card_sample$vector
     }
-    cat(prettify_vec(to_card(user_cards)), "\n")
+    tell_cards(user_cards)
+}
+
+tell_cards <- function(user_cards) {
+    cat("Your cards are", prettify_vec(to_card(user_cards)), "\n")
 }
 
 turn_decision <- function() {
