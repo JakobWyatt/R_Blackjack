@@ -6,6 +6,23 @@ blackjack <- function() {
     user_cards <- temp_card_sample$val
     card_deck <- temp_card_sample$vector
     cat("Your cards are", prettify_vec(to_card(user_cards)), "\n")
+    if(turn_decision()) {
+        temp_card_sample <- sample_remove(card_deck)
+        user_cards <- c(user_cards, temp_card_sample$val)
+        card_deck <- temp_card_sample$vector
+    }
+    cat(prettify_vec(to_card(user_cards)), "\n")
+}
+
+turn_decision <- function() {
+    user_input <- readline(prompt="Do you want to hit or stand? [hit/stand]: ")
+    if(user_input == "hit") {
+        return(TRUE);
+    } else if(user_input == "stand") {
+        return(FALSE)
+    } else {
+        return(turn_decision())
+    }
 }
 
 sample_remove <- function(vector, num=1) {
