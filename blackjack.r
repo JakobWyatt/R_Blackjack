@@ -5,12 +5,19 @@ blackjack <- function() {
     temp_card_sample <- sample_remove(card_deck, 2)
     user_cards <- temp_card_sample$val
     card_deck <- temp_card_sample$vector
-    cat("Your cards are", paste(to_card(user_cards), "and"), "\n")
+    cat("Your cards are", prettify_vec(to_card(user_cards)), "\n")
 }
 
 sample_remove <- function(vector, num=1) {
     x <- sample(vector, num)
     return(list("val"=x, "vector"=vector[! vector %in% x]))
+}
+
+prettify_vec <- function(vec) {
+    if (length(vec) <= 2) {
+        return(paste(vec, collapse=" and "))
+    }
+    return(paste(paste(vec[1:length(vec) - 1], collapse=", "), ", and ", vec[length(vec)], sep=""))
 }
 
 to_card <- function(num) {
