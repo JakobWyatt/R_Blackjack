@@ -8,20 +8,24 @@ blackjack <- function() {
     card_deck <- temp_card_sample$vector
     tell_cards(user_cards)
 
-    temp_card_sample <- blackjack_turn(user_cards, card_deck)
-    user_cards <- temp_card_sample$user_cards
-    card_deck <- temp_card_sample$card_deck
+    blackjack_game(user_cards, card_deck)
 }
 
-blackjack_turn <- function(user_cards, card_deck) {
+blackjack_game <- function(user_cards, card_deck) {
     #did we hit?
     if(turn_decision()) {
         temp_card_sample <- sample_remove(card_deck)
         user_cards <- c(user_cards, temp_card_sample$val)
         card_deck <- temp_card_sample$vector
+        tell_cards(user_cards)
+        
+        if(is_bust(user_cards)) {
+            cat("You are bust.\n")
+        } else {
+            blackjack_game(user_cards, card_deck)
+        }
     }
-    tell_cards(user_cards)
-    return(list("user_cards"=user_cards, "card_deck"=card_deck))
+    invisible(list("user_cards"=user_cards, "card_deck"=card_deck))
 }
 
 card_value <- function(card_num) {
@@ -47,6 +51,10 @@ hand_value <- function(card_hand) {
         card_vals[match(11, card_vals)] <- 1
     }
     return(sum(card_vals))
+}
+
+is_bust <- function(card_hand) {
+    return(hand_value(card_hand) > 21)
 }
 
 tell_cards <- function(user_cards) {
