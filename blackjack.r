@@ -30,6 +30,30 @@ blackjack_game <- function(user_cards, dealer_cards, card_deck) {
         }
     }
 
+    if(!is_bust(user_cards)) {
+        cat("Dealer cards are", prettify_vec(to_card(dealer_cards)), "\n")
+        while(!is_bust(dealer_cards) && dealer_decision(dealer_cards)) {
+            temp_card_sample <- sample_remove(card_deck)
+            dealer_cards <- c(dealer_cards, temp_card_sample$val)
+            card_deck <- temp_card_sample$vector
+            cat("Dealer cards are", prettify_vec(to_card(dealer_cards)), "\n")
+
+            if(is_bust(dealer_cards)) {
+                cat("The dealer is bust.\nYou win.\n")
+            }
+        }
+
+        if(!is_bust(dealer_cards)) {
+            if (hand_value(user_cards) > hand_value(dealer_cards)) {
+                cat("You win.\n")
+            } else if (hand_value(user_cards) == hand_value(dealer_cards)) {
+                cat("You draw.\n")
+            } else {
+                cat("You lose.\n")
+            }
+        }
+    }
+
     invisible(list("user_cards"=user_cards, "dealer_cards"=dealer_cards, "card_deck"=card_deck))
 }
 
