@@ -3,29 +3,38 @@ cat("Welcome to blackjack.r\nRun the function blackjack() to begin play.\n")
 blackjack <- function() {
     #initial draw
     card_deck <- 1:52
+    #user cards
     temp_card_sample <- sample_remove(card_deck, 2)
     user_cards <- temp_card_sample$val
     card_deck <- temp_card_sample$vector
+    #dealer cards
+    temp_card_sample <- sample_remove(card_deck, 2)
+    dealer_cards <- temp_card_sample$val
+    card_deck <- temp_card_sample$vector
+
+    cat("The dealers card up is the", to_card(dealer_cards[1]), "\n")
     tell_cards(user_cards)
 
-    blackjack_game(user_cards, card_deck)
+    blackjack_game(user_cards, dealer_cards, card_deck)
 }
 
-blackjack_game <- function(user_cards, card_deck) {
-    #did we hit?
-    if(turn_decision()) {
+blackjack_game <- function(user_cards, dealer_cards, card_deck) {
+    while(!is_bust(user_cards) && user_decision()) {
         temp_card_sample <- sample_remove(card_deck)
         user_cards <- c(user_cards, temp_card_sample$val)
         card_deck <- temp_card_sample$vector
         tell_cards(user_cards)
-        
+
         if(is_bust(user_cards)) {
-            cat("You are bust.\n")
-        } else {
-            blackjack_game(user_cards, card_deck)
+            cat("You are bust.\nYou lose.\n")
         }
     }
-    invisible(list("user_cards"=user_cards, "card_deck"=card_deck))
+
+    invisible(list("user_cards"=user_cards, "dealer_cards"=dealer_cards, "card_deck"=card_deck))
+}
+
+dealer_decision <- function(dealer_cards) {
+    return(hand_value(dealer_cards) < 17)
 }
 
 card_value <- function(card_num) {
@@ -61,7 +70,7 @@ tell_cards <- function(user_cards) {
     cat("Your cards are", prettify_vec(to_card(user_cards)), "\n")
 }
 
-turn_decision <- function() {
+user_decision <- function() {
     user_input <- readline(prompt="Do you want to hit or stand? [hit/stand]: ")
     if(user_input == "hit") {
         return(TRUE);
