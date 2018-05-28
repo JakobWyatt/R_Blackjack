@@ -13,48 +13,43 @@ blackjack <- function() {
     card_deck <- temp_card_sample$vector
 
     cat("The dealers card up is the", to_card(dealer_cards[1]), "\n")
-    tell_cards(user_cards)
-
     blackjack_game(user_cards, dealer_cards, card_deck)
 }
 
 blackjack_game <- function(user_cards, dealer_cards, card_deck) {
-    while(!is_bust(user_cards) && user_decision()) {
-        temp_card_sample <- sample_remove(card_deck)
-        user_cards <- c(user_cards, temp_card_sample$val)
-        card_deck <- temp_card_sample$vector
-        tell_cards(user_cards)
-
-        if(is_bust(user_cards)) {
-            cat("You are bust.\nYou lose.\n")
-        }
+    user_turn <- do_turn(user_cards, card_deck, user_decision, "Your cards are")
+    card_deck <- user_turn$card_deck
+    if(!is_bust(user_turn$player_cards)) {
+        dealer_turn <- do_turn(dealer_cards, card_deck, dealer_decision, "Dealer's cards are")
     }
-
-    if(!is_bust(user_cards)) {
-        cat("Dealer cards are", prettify_vec(to_card(dealer_cards)), "\n")
-        while(!is_bust(dealer_cards) && dealer_decision(dealer_cards)) {
-            temp_card_sample <- sample_remove(card_deck)
-            dealer_cards <- c(dealer_cards, temp_card_sample$val)
-            card_deck <- temp_card_sample$vector
-            cat("Dealer cards are", prettify_vec(to_card(dealer_cards)), "\n")
-
-            if(is_bust(dealer_cards)) {
-                cat("The dealer is bust.\nYou win.\n")
-            }
-        }
-
-        if(!is_bust(dealer_cards)) {
-            if (hand_value(user_cards) > hand_value(dealer_cards)) {
-                cat("You win.\n")
-            } else if (hand_value(user_cards) == hand_value(dealer_cards)) {
-                cat("You draw.\n")
-            } else {
-                cat("You lose.\n")
-            }
-        }
-    }
-
+    game_outcome(user_turn$player_cards, dealer_turn$player_cards)
     invisible(list("user_cards"=user_cards, "dealer_cards"=dealer_cards, "card_deck"=card_deck))
+}
+
+game_outcome <- function(user_cards, dealer_cards) {
+    if(is_bust(user_cards)) {
+        cat("You are bust. You lose.\n")
+    } else if (is_bust(dealer_cards)) {
+        cat("Dealer is bust. You win.\n")
+    } else if (hand_value(user_cards) > hand_value(dealer_cards)) {
+        cat("You win.\n")
+    } else if (hand_value(user_cards) == hand_value(dealer_cards)) {
+        cat("You draw.\n")
+    } else {
+        cat("You lose.\n")
+    }
+}
+
+do_turn <- function(player_cards, card_deck, player_decision, greeting) {
+    tell_cards(player_cards, greeting)
+    while(!is_bust(player_cards) && player_decision(player_cards)) {
+        temp_card_sample <- sample_remove(card_deck)
+        player_cards <- c(player_cards, temp_card_sample$val)
+        card_deck <- temp_card_sample$vector
+        tell_cards(player_cards, greeting)
+    }
+
+    return(list("player_cards"=player_cards, "card_deck"=card_deck))
 }
 
 dealer_decision <- function(dealer_cards) {
@@ -90,18 +85,20 @@ is_bust <- function(card_hand) {
     return(hand_value(card_hand) > 21)
 }
 
-tell_cards <- function(user_cards) {
-    cat("Your cards are", prettify_vec(to_card(user_cards)), "\n")
+tell_cards <- function(user_cards, greeting="Your cards are") {
+    cat(greeting, prettify_vec(to_card(user_cards)), "\n")
 }
 
-user_decision <- function() {
+#we take user_cards as an argument to this function to allow generality of decision functions
+#   even thought it is not used
+user_decision <- function(user_cards = NULL) {
     user_input <- readline(prompt="Do you want to hit or stand? [hit/stand]: ")
-    if(user_input == "hit") {
+    if(user_input == "hit" || user_input == "h") {
         return(TRUE);
-    } else if(user_input == "stand") {
+    } else if(user_input == "stand" || user_input == "s") {
         return(FALSE)
     } else {
-        return(turn_decision())
+        return(user_decision())
     }
 }
 
