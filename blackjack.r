@@ -2,18 +2,37 @@ cat("Welcome to blackjack.r\nRun the function blackjack() to begin play.\n")
 
 blackjack <- function() {
     #initial draw
-    card_deck <- 1:52
-    #user cards
-    temp_card_sample <- sample_remove(card_deck, 2)
-    user_cards <- temp_card_sample$val
-    card_deck <- temp_card_sample$vector
-    #dealer cards
-    temp_card_sample <- sample_remove(card_deck, 2)
-    dealer_cards <- temp_card_sample$val
-    card_deck <- temp_card_sample$vector
+    #six deck
+    card_deck <- rep(1:52, 6)
+   
+    repeat {
+        #user cards
+        temp_card_sample <- sample_remove(card_deck, 2)
+        user_cards <- temp_card_sample$val
+        card_deck <- temp_card_sample$vector
+        #dealer cards
+        temp_card_sample <- sample_remove(card_deck, 2)
+        dealer_cards <- temp_card_sample$val
+        card_deck <- temp_card_sample$vector
 
-    cat("The dealers card up is the", to_card(dealer_cards[1]), "\n")
-    blackjack_game(user_cards, dealer_cards, card_deck)
+        cat("The dealers card up is the", to_card(dealer_cards[1]), "\n")
+        card_deck <- blackjack_game(user_cards, dealer_cards, card_deck)
+
+        if(!continue_game()) {
+            break
+        }
+    }
+}
+
+continue_game <- function() {
+    user_input <- readline(prompt="Do you want to continue the game? [y/n]: ")
+    if (user_input == "y") {
+        return(TRUE)
+    } else if (user_input == "n") {
+        return(FALSE) 
+    } else {
+        return(continue_game())
+    }
 }
 
 blackjack_game <- function(user_cards, dealer_cards, card_deck) {
@@ -23,7 +42,7 @@ blackjack_game <- function(user_cards, dealer_cards, card_deck) {
         dealer_turn <- do_turn(dealer_cards, card_deck, dealer_decision, "Dealer's cards are")
     }
     game_outcome(user_turn$player_cards, dealer_turn$player_cards)
-    invisible(list("user_cards"=user_cards, "dealer_cards"=dealer_cards, "card_deck"=card_deck))
+    invisible(card_deck)
 }
 
 game_outcome <- function(user_cards, dealer_cards) {
