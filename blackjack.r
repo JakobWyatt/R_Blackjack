@@ -15,8 +15,10 @@ blackjack <- function() {
         dealer_cards <- temp_card_sample$val
         card_deck <- temp_card_sample$vector
 
-        cat("The dealers card up is the", to_card(dealer_cards[1]), "\n")
-        card_deck <- blackjack_game(user_cards, dealer_cards, card_deck)
+        if(!check_for_natural(user_cards, dealer_cards)) {
+            cat("The dealers card up is the", to_card(dealer_cards[1]), "\n")
+            card_deck <- blackjack_game(user_cards, dealer_cards, card_deck)
+        }
 
         if(!continue_game()) {
             break
@@ -43,6 +45,25 @@ blackjack_game <- function(user_cards, dealer_cards, card_deck) {
     }
     game_outcome(user_turn$player_cards, dealer_turn$player_cards)
     invisible(card_deck)
+}
+
+check_for_natural <- function(user_cards, dealer_cards) {
+    if (hand_value(user_cards) == 21) {
+        cat("Blackjack.\n")
+        if (hand_value(dealer_cards) == 21) {
+            tell_cards(dealer_cards, "Dealer's cards are")
+            cat("The dealer also has blackjack. You draw.\n")
+        } else {
+            cat("You Win.\n")
+        }
+        return(TRUE)
+    } else if (hand_value(dealer_cards) == 21) {
+        tell_cards(dealer_cards, "Dealer's cards are")
+        cat("The dealer has blackjack.\nYou lose.\n")
+        return(TRUE)
+    } else {
+        return(FALSE)
+    }
 }
 
 game_outcome <- function(user_cards, dealer_cards) {
